@@ -1,4 +1,10 @@
 {
+	"gcc-x64":
+	{
+		"LIBS": "/home/denis/libs",
+		"REPS": "/home/denis/reps"
+	},
+
 	"entries":
 	{
 		"type": "static",
@@ -8,8 +14,7 @@
 		"include_directories":
 		[
 			"$(SRC)",
-			"$(LIBS)/glad/include",
-			"$(LIBS)/glfw-3.3.4/include"
+			"$(REPS)"
 		],
 
 		"flags_additional": "$(STD_20) $(NO_LINK) $(VERBOSE) $(OPT_FASTX) $(SSE) $(FLAGS_ADD) -fPIC",
@@ -21,12 +26,12 @@
 				"watch_files": "$(SRC)/opengl/opengl.h"
 			},
 
-			"$(LIBS)/glfw-3.3.4/build/src/libglfw3.$(LIB_EXT)",
-
 			{
-				"file": "$(LIBS)/glad/src/glad.c",
+				"file": "$(SRC)/glad/src/glad.c",
 				"flags_additional": "-w"
-			}
+			},
+
+			"$(SRC)/glfw/glfw-3.3.4/build/src/libglfw3.$(LIB_EXT)"
 		]
 	}
 }
