@@ -1,0 +1,32 @@
+{
+	"entries":
+	{
+		"type": "static",
+
+		"name": "xgk-opengl",
+
+		"include_directories":
+		[
+			"$(SRC)",
+			"$(LIBS)/glad/include",
+			"$(LIBS)/glfw-3.3.4/include"
+		],
+
+		"flags_additional": "$(STD_20) $(NO_LINK) $(VERBOSE) $(OPT_FASTX) $(SSE) $(FLAGS_ADD) -fPIC",
+
+		"watch_files":
+		[
+			{
+				"file": "$(SRC)/opengl/opengl.cpp",
+				"watch_files": "$(SRC)/opengl/opengl.h"
+			},
+
+			"$(LIBS)/glfw-3.3.4/build/src/libglfw3.$(LIB_EXT)",
+
+			{
+				"file": "$(LIBS)/glad/src/glad.c",
+				"flags_additional": "-w"
+			}
+		]
+	}
+}
