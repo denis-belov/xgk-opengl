@@ -9,6 +9,7 @@
 
 #include "glfw/glfw-3.3.5/include/GLFW/glfw3.h"
 
+#include "xgk-api/src/material/material.h"
 #include "xgk-api/src/object/object.h"
 #include "xgk-api/src/scene/scene.h"
 
@@ -16,52 +17,118 @@
 
 namespace XGK
 {
-	namespace API
+	namespace OPENGL
 	{
-		struct OpenGLRenderer;
+		struct Renderer
+		{
+			GLFWwindow* window {};
+
+
+
+			Renderer (void);
+		};
+
+
 
 		struct Uniform
-		{};
+		{
+			// uniform_update_t functions
+			static void uniformMatrix4fv (Uniform*);
+
+
+
+			Renderer* renderer {};
+			API::Uniform* wrapper {};
+
+			GLint location {};
+
+			GLint locaiton {};
+
+			using uniform_update_t = void (*) (Uniform*);
+
+			uniform_update_t update {};
+
+
+
+			// Isn't Renderer* parameter needed?
+			Uniform (Renderer*, API::Uniform*);
+		};
+
+
 
 		struct UniformBlock
-		{};
+		{
+			Renderer* renderer {};
+			API::UniformBlock* wrapper {};
+
+			GLuint buffer {};
+
+			size_t buffer_length {};
+
+			std::vector<Uniform*> uniforms {};
+
+
+
+			UniformBlock (Renderer*, API::UniformBlock*);
+
+
+
+			void use (void);
+		};
+
+
 
 		struct Material
-		{};
+		{
+			static Material* used_instance;
+
+
+
+			Renderer* renderer {};
+			API::Material* wrapper {};
+
+			GLenum topology {};
+
+			GLuint program {};
+
+			std::vector<Uniform*> uniforms {};
+			std::vector<UniformBlock*> uniform_blocks {};
+
+
+
+			Material (Renderer*, API::Material*);
+
+
+
+			void use (void);
+		};
+
+
 
 		struct Object
 		{
-			OpenGLRenderer* renderer {};
-			XGK::API::Object wrapper {};
+			Renderer* renderer {};
+			API::Object* wrapper {};
 
 
 
-			Object (OpenGLRenderer*, Object*);
+			Object (Renderer*, API::Object*);
 
 
 
 			void draw (void) const;
 		};
 
+
+
 		struct Scene
 		{
-			OpenGLRenderer* renderer {};
-			XGK::API::Scene wrapper {};
+			Renderer* renderer {};
+			API::Scene* wrapper {};
 
 
 
-			Scene (OpenGLRenderer*, Scene*);
-		};
-
-
-
-		struct OpenGLRenderer
-		{
-			GLFWwindow* window {};
-
-
-
-			OpenGLRenderer (void);
+			Scene (Renderer*, API::Scene*);
 		};
 	}
 }

@@ -1,8 +1,11 @@
 {
-	"gcc-x64":
+	"variables":
 	{
-		"LIBS": "/home/denis/libs",
-		"REPS": "/home/denis/reps"
+		"gcc-x64":
+		{
+			"LIBS": "/home/denis/libs",
+			"REPS": "/home/denis/reps"
+		}
 	},
 
 	"entries":
@@ -14,7 +17,9 @@
 		"include_directories":
 		[
 			"$(SRC)",
-			"$(REPS)"
+			"$(SRC)/glad/include",
+			"$(REPS)/denis-belov",
+			"$(REPS)/denis-belov/xgk-api/src"
 		],
 
 		"flags_additional": "$(STD_20) $(NO_LINK) $(VERBOSE) $(OPT_FASTX) $(SSE) $(FLAGS_ADD) -fPIC",
@@ -22,8 +27,8 @@
 		"watch_files":
 		[
 			{
-				"file": "$(SRC)/opengl/opengl.cpp",
-				"watch_files": "$(SRC)/opengl/opengl.h"
+				"file": "$(SRC)/opengl.cpp",
+				"watch_files": "$(SRC)/opengl.h"
 			},
 
 			{
@@ -31,7 +36,7 @@
 				"flags_additional": "-w"
 			},
 
-			"$(SRC)/glfw/glfw-3.3.4/build/src/libglfw3.$(LIB_EXT)"
+			"$(SRC)/glfw/glfw-3.3.5/build/src/libglfw3.$(LIB_EXT)"
 		]
 	}
 }
