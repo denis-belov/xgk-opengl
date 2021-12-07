@@ -21,11 +21,28 @@ namespace XGK
 	{
 		struct Renderer
 		{
+			size_t window_width {};
+			size_t window_height {};
+
 			GLFWwindow* window {};
 
+			GLuint framebuffer {};
+			GLuint framebuffer_renderbuffer_color {};
+			GLuint framebuffer_renderbuffer_depth {};
+			GLuint pixel_pack_buffer {};
+
+			void* pixel_data {};
+
+			size_t pbo_index {};
+			size_t next_pbo_index { 1 };
 
 
-			Renderer (void);
+
+			Renderer (const size_t&, const size_t&);
+
+
+
+			void endLoopOffscreen (void);
 		};
 
 

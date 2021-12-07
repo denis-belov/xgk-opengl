@@ -8,6 +8,127 @@ namespace XGK
 {
 	namespace OPENGL
 	{
+		Renderer::Renderer (const size_t& _window_width, const size_t& _window_height)
+		{
+			// glfwInit();
+
+			// glfwDefaultWindowHints();
+			// glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+			// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+			// window = glfwCreateWindow(800, 600, "", nullptr, nullptr);
+
+			// // glfwSetKeyCallback(window, glfw_key_callback);
+			// glfwMakeContextCurrent(window);
+			// glfwSwapInterval(0);
+			// // glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+
+
+
+			// gladLoadGL();
+
+
+
+			window_width = _window_width;
+			window_height = _window_height;
+
+
+
+			glfwInit();
+
+			glfwDefaultWindowHints();
+			glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+
+			window = glfwCreateWindow(1, 1, "", nullptr, nullptr);
+
+			glfwHideWindow(window);
+
+			glfwMakeContextCurrent(window);
+			// glfwSwapInterval(1);
+
+
+
+			gladLoadGL();
+
+
+
+			glViewport(0, 0, window_width, window_height);
+			// glClearColor(0.125f, 0.125f, 0.125f, 1.0f);
+
+
+
+			// Framebuffer object for offscreen rendering
+			{
+				glCreateFramebuffers(1, &framebuffer);
+				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
+				glDrawBuffer(GL_COLOR_ATTACHMENT0);
+				glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+
+				glCreateRenderbuffers(1, &framebuffer_renderbuffer_color);
+				glBindRenderbuffer(GL_RENDERBUFFER, framebuffer_renderbuffer_color);
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, window_width, window_height);
+				glBindRenderbuffer(GL_RENDERBUFFER, 0);
+				glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, framebuffer_renderbuffer_color);
+
+				// Depth attachment
+				// TODO: make depth buffer optional.
+				{
+					glEnable(GL_DEPTH_TEST);
+					glDepthFunc(GL_LEQUAL);
+
+					glCreateRenderbuffers(1, &framebuffer_renderbuffer_depth);
+					glBindRenderbuffer(GL_RENDERBUFFER, framebuffer_renderbuffer_depth);
+					glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, window_width, window_height);
+					glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+					glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, framebuffer_renderbuffer_depth);
+				}
+
+				// glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			}
+
+
+
+			// Pixel pack buffer
+			{
+				glCreateBuffers(1, &pixel_pack_buffer);
+
+				glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_pack_buffer);
+				// TODO: cache window_width * window_height * 4
+				glBufferData(GL_PIXEL_PACK_BUFFER, window_width * window_height * 4, nullptr, GL_DYNAMIC_READ);
+
+				// Redundant call. GL_COLOR_ATTACHMENT0 is a default framebuffer read buffer.
+				glReadBuffer(GL_COLOR_ATTACHMENT0);
+				glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+				pixel_data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+			}
+		}
+
+		void Renderer::endLoopOffscreen (void)
+		{
+			// glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_pack_buffer);
+			glBufferData(GL_PIXEL_PACK_BUFFER, window_width * window_height * 4, nullptr, GL_DYNAMIC_READ);
+			// glReadBuffer(GL_COLOR_ATTACHMENT0);
+			glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+			pixel_data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+
+			// if (pixel_data)
+			// {
+			// 	glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+			// }
+
+			// glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			// glDrawBuffer(GL_BACK);
+			// glReadBuffer(GL_FRONT);
+		}
+
+
+
 		void Uniform::uniformMatrix4fv (Uniform* uniform)
 		{
 			glUniformMatrix4fv(uniform->location, 1, false, (float*) uniform->wrapper->object_addr);
@@ -174,29 +295,6 @@ namespace XGK
 		{
 			renderer = _renderer;
 			wrapper = _wrapper;
-		}
-
-
-
-		Renderer::Renderer ()
-		{
-			glfwInit();
-
-			glfwDefaultWindowHints();
-			glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-			window = glfwCreateWindow(800, 600, "", nullptr, nullptr);
-
-			// glfwSetKeyCallback(window, glfw_key_callback);
-			glfwMakeContextCurrent(window);
-			glfwSwapInterval(0);
-			// glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
-
-
-
-			gladLoadGL();
 		}
 	}
 }
