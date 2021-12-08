@@ -39,7 +39,8 @@ namespace XGK
 
 			glfwDefaultWindowHints();
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
 			window = glfwCreateWindow(1, 1, "", nullptr, nullptr);
@@ -149,10 +150,8 @@ namespace XGK
 
 
 
-			for (size_t i {}; i < wrapper->uniforms.size(); ++i)
+			for (API::Uniform* uniform_wrapper : wrapper->uniforms)
 			{
-				API::Uniform* uniform_wrapper { wrapper->uniforms[i] };
-
 				Uniform* uniform { new Uniform { renderer, uniform_wrapper } };
 
 				buffer_length += uniform_wrapper->size;
@@ -194,29 +193,28 @@ namespace XGK
 
 
 
-			GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-			glShaderSource(vertex_shader, 1, (const GLchar* const*) wrapper->glsl4_code_vertex.c_str(), nullptr);
-			glCompileShader(vertex_shader);
+			const GLchar* _glsl4_code_vertex { wrapper->glsl4_code_vertex.c_str() };
 
-			GLuint fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-			glShaderSource(fragment_shader, 1, (const GLchar* const*) wrapper->glsl4_code_fragment.c_str(), nullptr);
-			glCompileShader(fragment_shader);
+			GLuint shader_vertex = glCreateShader(GL_VERTEX_SHADER);
+			glShaderSource(shader_vertex, 1, &_glsl4_code_vertex, nullptr);
+			glCompileShader(shader_vertex);
+
+			const GLchar* _glsl4_code_fragment { wrapper->glsl4_code_fragment.c_str() };
+
+			GLuint shader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
+			glShaderSource(shader_fragment, 1, &_glsl4_code_fragment, nullptr);
+			glCompileShader(shader_fragment);
 
 			program = glCreateProgram();
-			glAttachShader(program, vertex_shader);
-			glAttachShader(program, fragment_shader);
+			glAttachShader(program, shader_vertex);
+			glAttachShader(program, shader_fragment);
 
 			glLinkProgram(program);
 
 
 
-			// glUseProgram(program);
-
-			// wrapper->uniforms.size() may not be cached since size() is inline method (?)
-			for (size_t i {}; i < wrapper->uniforms.size(); ++i)
+			for (API::Uniform* uniform_wrapper : wrapper->uniforms)
 			{
-				API::Uniform* uniform_wrapper { wrapper->uniforms[i] };
-
 				Uniform* uniform { new Uniform { renderer, uniform_wrapper } };
 
 				uniform->location = glGetUniformLocation(program, (const GLchar*) uniform_wrapper->name.c_str());
@@ -225,20 +223,14 @@ namespace XGK
 				{
 					uniform->update = Uniform::uniformMatrix4fv;
 
-					// uniform->update(uniform);
-
 					uniforms.push_back(uniform);
 				}
 			}
 
-			// glUseProgram(0);
 
 
-
-			for (size_t i {}; i < wrapper->uniform_blocks.size(); ++i)
+			for (API::UniformBlock* uniform_block_wrapper : wrapper->uniform_blocks)
 			{
-				API::UniformBlock* uniform_block_wrapper { wrapper->uniform_blocks[i] };
-
 				UniformBlock* uniform_block { new UniformBlock { renderer, uniform_block_wrapper } };
 
 				glUniformBlockBinding
@@ -283,7 +275,8 @@ namespace XGK
 		{
 			glDrawArrays
 			(
-				Material::used_instance->topology,
+				// Material::used_instance->topology,
+				GL_TRIANGLES,
 				wrapper->scene_vertex_data_offset,
 				wrapper->scene_vertex_data_length
 			);
