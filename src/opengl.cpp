@@ -4,25 +4,37 @@
 
 
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
+
+
 namespace XGK
 {
 	namespace OPENGL
 	{
 		Renderer::Renderer (const size_t& _window_width, const size_t& _window_height)
 		{
+			window_width = _window_width;
+			window_height = _window_height;
+
+
+
 			// glfwInit();
 
 			// glfwDefaultWindowHints();
 			// glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-			// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			// // glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+			// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 			// glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-			// window = glfwCreateWindow(800, 600, "", nullptr, nullptr);
+			// window = glfwCreateWindow(1, 1, "", nullptr, nullptr);
 
-			// // glfwSetKeyCallback(window, glfw_key_callback);
+			// glfwHideWindow(window);
+
 			// glfwMakeContextCurrent(window);
-			// glfwSwapInterval(0);
-			// // glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
+			// // glfwSwapInterval(1);
 
 
 
@@ -30,8 +42,57 @@ namespace XGK
 
 
 
-			window_width = _window_width;
-			window_height = _window_height;
+			// glViewport(0, 0, window_width, window_height);
+			// // glClearColor(0.125f, 0.125f, 0.125f, 1.0f);
+
+
+
+			// // Framebuffer object for offscreen rendering
+			// {
+			// 	glCreateFramebuffers(1, &framebuffer);
+			// 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
+			// 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+			// 	glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
+
+			// 	glCreateRenderbuffers(1, &framebuffer_renderbuffer_color);
+			// 	glBindRenderbuffer(GL_RENDERBUFFER, framebuffer_renderbuffer_color);
+			// 	glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, window_width, window_height);
+			// 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+			// 	glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, framebuffer_renderbuffer_color);
+
+			// 	// Depth attachment
+			// 	// TODO: make depth buffer optional.
+			// 	{
+			// 		glEnable(GL_DEPTH_TEST);
+			// 		glDepthFunc(GL_LEQUAL);
+
+			// 		glCreateRenderbuffers(1, &framebuffer_renderbuffer_depth);
+			// 		glBindRenderbuffer(GL_RENDERBUFFER, framebuffer_renderbuffer_depth);
+			// 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, window_width, window_height);
+			// 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+			// 		glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, framebuffer_renderbuffer_depth);
+			// 	}
+
+			// 	// glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			// }
+
+
+
+			// // Pixel pack buffer
+			// {
+			// 	glCreateBuffers(1, &pixel_pack_buffer);
+
+			// 	glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_pack_buffer);
+			// 	// TODO: cache window_width * window_height * 4
+			// 	glBufferData(GL_PIXEL_PACK_BUFFER, window_width * window_height * 4, nullptr, GL_DYNAMIC_READ);
+
+			// 	// Redundant call. GL_COLOR_ATTACHMENT0 is a default framebuffer read buffer.
+			// 	glReadBuffer(GL_COLOR_ATTACHMENT0);
+			// 	glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+			// 	pixel_data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+			// }
 
 
 
@@ -39,16 +100,15 @@ namespace XGK
 
 			glfwDefaultWindowHints();
 			glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-			// glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-			window = glfwCreateWindow(1, 1, "", nullptr, nullptr);
+			window = glfwCreateWindow(window_width, window_height, "", nullptr, nullptr);
 
-			glfwHideWindow(window);
-
+			// glfwSetKeyCallback(window, glfw_key_callback);
 			glfwMakeContextCurrent(window);
-			// glfwSwapInterval(1);
+			glfwSwapInterval(0);
+			// glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
 
 
 
@@ -56,76 +116,32 @@ namespace XGK
 
 
 
-			glViewport(0, 0, window_width, window_height);
-			// glClearColor(0.125f, 0.125f, 0.125f, 1.0f);
-
-
-
-			// Framebuffer object for offscreen rendering
-			{
-				glCreateFramebuffers(1, &framebuffer);
-				glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer);
-				glDrawBuffer(GL_COLOR_ATTACHMENT0);
-				glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer);
-
-				glCreateRenderbuffers(1, &framebuffer_renderbuffer_color);
-				glBindRenderbuffer(GL_RENDERBUFFER, framebuffer_renderbuffer_color);
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, window_width, window_height);
-				glBindRenderbuffer(GL_RENDERBUFFER, 0);
-				glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, framebuffer_renderbuffer_color);
-
-				// Depth attachment
-				// TODO: make depth buffer optional.
-				{
-					glEnable(GL_DEPTH_TEST);
-					glDepthFunc(GL_LEQUAL);
-
-					glCreateRenderbuffers(1, &framebuffer_renderbuffer_depth);
-					glBindRenderbuffer(GL_RENDERBUFFER, framebuffer_renderbuffer_depth);
-					glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, window_width, window_height);
-					glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-					glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, framebuffer_renderbuffer_depth);
-				}
-
-				// glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			}
-
-
-
-			// Pixel pack buffer
-			{
-				glCreateBuffers(1, &pixel_pack_buffer);
-
-				glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_pack_buffer);
-				// TODO: cache window_width * window_height * 4
-				glBufferData(GL_PIXEL_PACK_BUFFER, window_width * window_height * 4, nullptr, GL_DYNAMIC_READ);
-
-				// Redundant call. GL_COLOR_ATTACHMENT0 is a default framebuffer read buffer.
-				glReadBuffer(GL_COLOR_ATTACHMENT0);
-				glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
-				pixel_data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
-			}
+			glViewport(0, 0, 800, 600);
+			glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LESS);
 		}
 
 		void Renderer::endLoopOffscreen (void)
 		{
-			// glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_pack_buffer);
-			glBufferData(GL_PIXEL_PACK_BUFFER, window_width * window_height * 4, nullptr, GL_DYNAMIC_READ);
-			// glReadBuffer(GL_COLOR_ATTACHMENT0);
-			glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			// // glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_pack_buffer);
+			// glBufferData(GL_PIXEL_PACK_BUFFER, window_width * window_height * 4, nullptr, GL_DYNAMIC_READ);
+			// // glReadBuffer(GL_COLOR_ATTACHMENT0);
+			// glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-			pixel_data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+			// pixel_data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 
-			// if (pixel_data)
-			// {
-			// 	glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
-			// }
+			// // if (pixel_data)
+			// // {
+			// // 	glUnmapBuffer(GL_PIXEL_PACK_BUFFER);
+			// // }
 
-			// glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-			// glDrawBuffer(GL_BACK);
-			// glReadBuffer(GL_FRONT);
+			// // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+			// // glDrawBuffer(GL_BACK);
+			// // glReadBuffer(GL_FRONT);
+
+
+
+			glfwSwapBuffers(window);
 		}
 
 
@@ -174,10 +190,17 @@ namespace XGK
 
 		void UniformBlock::use (void)
 		{
-			for (size_t i {}; i < uniforms.size(); ++i)
-			{
-				Uniform* uniform = uniforms[i];
+			glBindBuffer(GL_UNIFORM_BUFFER, buffer);
 
+			// for (size_t i {}; i < uniforms.size(); ++i)
+			// {
+			// 	Uniform* uniform = uniforms[i];
+
+			// 	glBufferSubData(GL_UNIFORM_BUFFER, uniform->wrapper->block_index, uniform->wrapper->size, uniform->wrapper->object_addr);
+			// }
+
+			for (Uniform* uniform : uniforms)
+			{
 				glBufferSubData(GL_UNIFORM_BUFFER, uniform->wrapper->block_index, uniform->wrapper->size, uniform->wrapper->object_addr);
 			}
 		}
@@ -195,15 +218,73 @@ namespace XGK
 
 			const GLchar* _glsl4_code_vertex { wrapper->glsl4_code_vertex.c_str() };
 
+			cout << _glsl4_code_vertex << endl;
+
 			GLuint shader_vertex = glCreateShader(GL_VERTEX_SHADER);
 			glShaderSource(shader_vertex, 1, &_glsl4_code_vertex, nullptr);
 			glCompileShader(shader_vertex);
 
+			{
+				GLint isCompiled = 0;
+				glGetShaderiv(shader_vertex, GL_COMPILE_STATUS, &isCompiled);
+				cout << isCompiled << endl;
+				// if(isCompiled == GL_FALSE)
+				{
+					GLint maxLength = 0;
+					glGetShaderiv(shader_vertex, GL_INFO_LOG_LENGTH, &maxLength);
+
+					// The maxLength includes the NULL character
+					std::vector<GLchar> errorLog(maxLength);
+					glGetShaderInfoLog(shader_vertex, maxLength, &maxLength, &errorLog[0]);
+
+					for (GLchar err : errorLog)
+					{
+						cout << err;
+					}
+
+					cout << endl;
+
+					// // Provide the infolog in whatever manor you deem best.
+					// // Exit with failure.
+					// glDeleteShader(shader_vertex); // Don't leak the shader.
+					// return;
+				}
+			}
+
 			const GLchar* _glsl4_code_fragment { wrapper->glsl4_code_fragment.c_str() };
+
+			cout << _glsl4_code_fragment << endl;
 
 			GLuint shader_fragment = glCreateShader(GL_FRAGMENT_SHADER);
 			glShaderSource(shader_fragment, 1, &_glsl4_code_fragment, nullptr);
 			glCompileShader(shader_fragment);
+
+			{
+				GLint isCompiled = 0;
+				glGetShaderiv(shader_fragment, GL_COMPILE_STATUS, &isCompiled);
+				cout << isCompiled << endl;
+				// if(isCompiled == GL_FALSE)
+				{
+					GLint maxLength = 0;
+					glGetShaderiv(shader_fragment, GL_INFO_LOG_LENGTH, &maxLength);
+
+					// The maxLength includes the NULL character
+					std::vector<GLchar> errorLog(maxLength);
+					glGetShaderInfoLog(shader_fragment, maxLength, &maxLength, &errorLog[0]);
+
+					for (GLchar err : errorLog)
+					{
+						cout << err;
+					}
+
+					cout << endl;
+
+					// // Provide the infolog in whatever manor you deem best.
+					// // Exit with failure.
+					// glDeleteShader(shader_fragment); // Don't leak the shader.
+					// return;
+				}
+			}
 
 			program = glCreateProgram();
 			glAttachShader(program, shader_vertex);
@@ -255,10 +336,15 @@ namespace XGK
 
 			glUseProgram(program);
 
-			for (size_t i {}; i < uniforms.size(); ++i)
-			{
-				Uniform* uniform = uniforms[i];
+			// for (size_t i {}; i < uniforms.size(); ++i)
+			// {
+			// 	Uniform* uniform = uniforms[i];
 
+			// 	uniform->update(uniform);
+			// }
+
+			for (Uniform* uniform : uniforms)
+			{
 				uniform->update(uniform);
 			}
 		}
