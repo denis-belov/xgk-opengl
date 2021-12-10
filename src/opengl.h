@@ -19,13 +19,37 @@ namespace XGK
 {
 	namespace OPENGL
 	{
-		struct Renderer
+		struct RendererBase
 		{
 			size_t window_width {};
 			size_t window_height {};
 
 			GLFWwindow* window {};
 
+
+
+			RendererBase (const size_t&, const size_t&);
+
+
+
+			virtual void endLoop (void) = 0;
+		};
+
+
+
+		struct Renderer : public RendererBase
+		{
+			Renderer (const size_t&, const size_t&);
+
+
+
+			virtual void endLoop (void) override;
+		};
+
+
+
+		struct RendererOffscreen : public RendererBase
+		{
 			GLuint framebuffer {};
 			GLuint framebuffer_renderbuffer_color {};
 			GLuint framebuffer_renderbuffer_depth {};
@@ -38,11 +62,11 @@ namespace XGK
 
 
 
-			Renderer (const size_t&, const size_t&);
+			RendererOffscreen (const size_t&, const size_t&);
 
 
 
-			void endLoopOffscreen (void);
+			virtual void endLoop (void) override;
 		};
 
 
@@ -54,7 +78,7 @@ namespace XGK
 
 
 
-			Renderer* renderer {};
+			RendererBase* renderer {};
 			API::Uniform* wrapper {};
 
 			GLint location {};
@@ -68,14 +92,14 @@ namespace XGK
 
 
 			// Isn't Renderer* parameter needed?
-			Uniform (Renderer*, API::Uniform*);
+			Uniform (RendererBase*, API::Uniform*);
 		};
 
 
 
 		struct UniformBlock
 		{
-			Renderer* renderer {};
+			RendererBase* renderer {};
 			API::UniformBlock* wrapper {};
 
 			GLuint buffer {};
@@ -86,7 +110,7 @@ namespace XGK
 
 
 
-			UniformBlock (Renderer*, API::UniformBlock*);
+			UniformBlock (RendererBase*, API::UniformBlock*);
 
 
 
@@ -101,7 +125,7 @@ namespace XGK
 
 
 
-			Renderer* renderer {};
+			RendererBase* renderer {};
 			API::Material* wrapper {};
 
 			GLenum topology {};
@@ -113,7 +137,7 @@ namespace XGK
 
 
 
-			Material (Renderer*, API::Material*);
+			Material (RendererBase*, API::Material*);
 
 
 
@@ -124,12 +148,12 @@ namespace XGK
 
 		struct Object
 		{
-			Renderer* renderer {};
+			RendererBase* renderer {};
 			API::Object* wrapper {};
 
 
 
-			Object (Renderer*, API::Object*);
+			Object (RendererBase*, API::Object*);
 
 
 
@@ -140,12 +164,12 @@ namespace XGK
 
 		struct Scene
 		{
-			Renderer* renderer {};
+			RendererBase* renderer {};
 			API::Scene* wrapper {};
 
 
 
-			Scene (Renderer*, API::Scene*);
+			Scene (RendererBase*, API::Scene*);
 		};
 	}
 }
