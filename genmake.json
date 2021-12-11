@@ -16,10 +16,8 @@
 
 		"include_directories":
 		[
-			"$(SRC)",
 			"$(SRC)/glad/include",
-			"$(REPS)/denis-belov",
-			"$(REPS)/denis-belov/xgk-api/src"
+			"$(REPS)/denis-belov"
 		],
 
 		"flags_additional": "$(STD_20) $(NO_LINK) $(VERBOSE) $(OPT_FASTX) $(SSE) $(FLAGS_ADD) -fPIC",

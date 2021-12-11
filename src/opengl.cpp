@@ -1,6 +1,6 @@
 #include "glad/include/glad/glad.h"
 
-#include "opengl.h"
+#include "xgk-opengl/src/opengl.h"
 
 
 
@@ -14,7 +14,7 @@ namespace XGK
 {
 	namespace OPENGL
 	{
-		RendererBase::RendererBase (const size_t& _window_width, const size_t& _window_height)
+		RendererBase::RendererBase (API::Renderer* _wrapper)
 		{
 			// cout << (char *) glGetString(GL_VERSION) << endl;
 			// cout << (char *) glGetString(GL_VENDOR) << endl;
@@ -22,8 +22,7 @@ namespace XGK
 
 
 
-			window_width = _window_width;
-			window_height = _window_height;
+			wrapper = _wrapper;
 
 
 
@@ -34,7 +33,7 @@ namespace XGK
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 
-			window = glfwCreateWindow(window_width, window_height, "", nullptr, nullptr);
+			window = glfwCreateWindow(wrapper->width, wrapper->height, "", nullptr, nullptr);
 
 			// glfwSetKeyCallback(window, glfw_key_callback);
 			glfwMakeContextCurrent(window);
@@ -46,7 +45,7 @@ namespace XGK
 
 
 
-			glViewport(0, 0, window_width, window_height);
+			glViewport(0, 0, wrapper->width, wrapper->height);
 			glEnable(GL_DEPTH_TEST);
 			glDepthFunc(GL_LESS);
 
@@ -55,7 +54,7 @@ namespace XGK
 
 
 
-		Renderer::Renderer (const size_t& _window_width, const size_t& _window_height) : RendererBase(_window_width, _window_height)
+		Renderer::Renderer (API::Renderer* _wrapper) : RendererBase(_wrapper)
 		{
 			glfwSwapInterval(0);
 		}
@@ -67,7 +66,7 @@ namespace XGK
 
 
 
-		RendererOffscreen::RendererOffscreen (const size_t& _window_width, const size_t& _window_height) : RendererBase(_window_width, _window_height)
+		RendererOffscreen::RendererOffscreen (API::Renderer* _wrapper) : RendererBase(_wrapper)
 		{
 			glfwHideWindow(window);
 
@@ -84,7 +83,7 @@ namespace XGK
 
 				glCreateRenderbuffers(1, &framebuffer_renderbuffer_color);
 				glBindRenderbuffer(GL_RENDERBUFFER, framebuffer_renderbuffer_color);
-				glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, window_width, window_height);
+				glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA8, wrapper->width, wrapper->height);
 				glBindRenderbuffer(GL_RENDERBUFFER, 0);
 				glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, framebuffer_renderbuffer_color);
 
@@ -96,7 +95,7 @@ namespace XGK
 
 					glCreateRenderbuffers(1, &framebuffer_renderbuffer_depth);
 					glBindRenderbuffer(GL_RENDERBUFFER, framebuffer_renderbuffer_depth);
-					glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, window_width, window_height);
+					glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, wrapper->width, wrapper->height);
 					glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
 					glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, framebuffer_renderbuffer_depth);
@@ -112,12 +111,12 @@ namespace XGK
 				glCreateBuffers(1, &pixel_pack_buffer);
 
 				glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_pack_buffer);
-				// TODO: cache window_width * window_height * 4
-				glBufferData(GL_PIXEL_PACK_BUFFER, window_width * window_height * 4, nullptr, GL_DYNAMIC_READ);
+				// TODO: cache wrapper->width * wrapper->height * 4
+				glBufferData(GL_PIXEL_PACK_BUFFER, wrapper->width * wrapper->height * 4, nullptr, GL_DYNAMIC_READ);
 
 				// Redundant call. GL_COLOR_ATTACHMENT0 is a default framebuffer read buffer.
 				glReadBuffer(GL_COLOR_ATTACHMENT0);
-				glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+				glReadPixels(0, 0, wrapper->width, wrapper->height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 				pixel_data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 			}
@@ -126,9 +125,9 @@ namespace XGK
 		void RendererOffscreen::endLoop (void)
 		{
 			// glBindBuffer(GL_PIXEL_PACK_BUFFER, pixel_pack_buffer);
-			glBufferData(GL_PIXEL_PACK_BUFFER, window_width * window_height * 4, nullptr, GL_DYNAMIC_READ);
+			glBufferData(GL_PIXEL_PACK_BUFFER, wrapper->width * wrapper->height * 4, nullptr, GL_DYNAMIC_READ);
 			// glReadBuffer(GL_COLOR_ATTACHMENT0);
-			glReadPixels(0, 0, window_width, window_height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			glReadPixels(0, 0, wrapper->width, wrapper->height, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
 			pixel_data = glMapBuffer(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
 

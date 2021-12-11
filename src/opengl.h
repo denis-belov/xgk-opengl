@@ -9,6 +9,9 @@
 
 #include "glfw/glfw-3.3.5/include/GLFW/glfw3.h"
 
+#include "xgk-api/src/renderer/renderer.h"
+#include "xgk-api/src/uniform/uniform.h"
+#include "xgk-api/src/uniform-block/uniform-block.h"
 #include "xgk-api/src/material/material.h"
 #include "xgk-api/src/object/object.h"
 #include "xgk-api/src/scene/scene.h"
@@ -21,14 +24,13 @@ namespace XGK
 	{
 		struct RendererBase
 		{
-			size_t window_width {};
-			size_t window_height {};
+			API::Renderer* wrapper {};
 
 			GLFWwindow* window {};
 
 
 
-			RendererBase (const size_t&, const size_t&);
+			RendererBase (API::Renderer*);
 
 
 
@@ -39,7 +41,7 @@ namespace XGK
 
 		struct Renderer : public RendererBase
 		{
-			Renderer (const size_t&, const size_t&);
+			Renderer (API::Renderer*);
 
 
 
@@ -50,19 +52,19 @@ namespace XGK
 
 		struct RendererOffscreen : public RendererBase
 		{
+			void* pixel_data {};
+
 			GLuint framebuffer {};
 			GLuint framebuffer_renderbuffer_color {};
 			GLuint framebuffer_renderbuffer_depth {};
 			GLuint pixel_pack_buffer {};
-
-			void* pixel_data {};
 
 			size_t pbo_index {};
 			size_t next_pbo_index { 1 };
 
 
 
-			RendererOffscreen (const size_t&, const size_t&);
+			RendererOffscreen (API::Renderer*);
 
 
 
